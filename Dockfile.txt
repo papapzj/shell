@@ -1,0 +1,32 @@
+FROM docker.io/centos:latest
+RUN rm -rf /etc/yum.repos.d/*
+ADD local.repo /etc/yum.repos.d/local.repo
+RUN yum -y install net-tools vim psmisc bash-completion iproute
+
+安装ssh
+FROM mycentos:latest
+RUN yum -y install openssh-server initscripts
+RUN sshd-keygen
+RUN ehco b | passwd --stdin root
+CMD ["/usr/sbin/sshd","-D"]
+
+
+安装httpd
+FROM docker.io/myos:latest
+RUN yum -y install httpd
+ENV EnvironmentFile=/etc/sysconfig/httpd
+WORKDIR /var/www/html/ 
+ADD index.html index.html
+ENV LANG=C
+ENV PS1="[web@\h \W]# "
+EXPOSE 80 
+EXPOSE 443
+CMD ["/usr/sbin/httpd", "-DFOREGROUND"]
+
+
+
+index.html
+<html>
+   <h1>Hello nsd1907</h1>
+</html>
+
